@@ -3,7 +3,7 @@ use <steel section.scad>;
 section_d = 70;
 section_t = 3;
 gantry_width = 3000;
-side_width = 200;
+side_width = 1000;
 height = 1600;
 
 // cut from
@@ -36,9 +36,9 @@ module side() {
     translate([section_d/2, section_d/2, height-10]) plate();
     translate([section_d/2, section_d/2, height-20]) plate();
     translate([0, 0, height/2]) section(height/2 - plate_t*2);
-    one_side_width = side_width/2 + section_d;
+    one_side_width = side_width/2;
     one_side_height = height/2 + section_d*2 - plate_t*2;
-    tri_length = sqrt(pow(one_side_width, 2) + pow(one_side_height, 2));
+    tri_length = sqrt(one_side_width*one_side_width + one_side_height*one_side_height);
     a = atan(one_side_width/one_side_height);
     translate([-one_side_width, 0, 0]) rotate([0, a, 0]) mitre(a, tri_length) section(tri_length);
     translate([one_side_width + section_d, section_d, 0]) rotate([0, -a, 0])
@@ -46,12 +46,12 @@ module side() {
 }
 
 module mitre(a, tri_length) {
-    rotate([0, a-a, 0]) render() difference() {
+    render() rotate([0, a-a, 0]) difference() {
         children();
-        rotate([0, 90-a, 0]) cube([section_d, section_d, section_d*4]);
+        rotate([0, 90-a, 0]) translate([0, 0, -section_d]) cube([section_d, section_d, tri_length]);
         
         // TODO: this bit isn't right
-        translate([0, 0, tri_length+section_d*2]) rotate([0, 180-a, 0]) cube([section_d, section_d, section_d*4]);
+        translate([0, 0, tri_length]) rotate([0, -a, 0]) translate([0, 0, -tri_length]) cube([section_d, section_d, tri_length+section_d]);
     }
 }
 
